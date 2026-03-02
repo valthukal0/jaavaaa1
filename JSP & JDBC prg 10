@@ -1,0 +1,134 @@
+CREATE TABLE users (
+  id NUMBER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name VARCHAR2(100) NOT NULL,
+  email VARCHAR2(100) NOT NULL
+  );
+
+
+
+
+
+index.jsp
+<%@ page import="java.sql.*" %>
+
+<%
+    // ===== DB CONFIGURATION =====
+    String url = "jdbc:oracle:thin:@//172.16.0.16:1521/orcl";
+    String user = "1mcaa41";
+    String pass = "iii";
+
+    Class.forName("oracle.jdbc.driver.OracleDriver");
+    Connection conn = DriverManager.getConnection(url, user, pass);
+
+    String action = request.getParameter("action");
+
+    // ===== INSERT =====
+    if (action != null && action.equals("insert")) {
+        PreparedStatement ps = conn.prepareStatement(
+            "INSERT INTO users (name, email) VALUES (?, ?)"
+        );
+        ps.setString(1, request.getParameter("name"));
+        ps.setString(2, request.getParameter("email"));
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    // ===== UPDATE =====
+    if (action != null && action.equals("update")) {
+        PreparedStatement ps = conn.prepareStatement(
+            "UPDATE users SET name=?, email=? WHERE id=?"
+        );
+        ps.setString(1, request.getParameter("name"));
+        ps.setString(2, request.getParameter("email"));
+        ps.setInt(3, Integer.parseInt(request.getParameter("id")));
+        ps.executeUpdate();
+        ps.close();
+    }
+
+    // ===== DELETE =====
+    if (action != null && action.equals("delete")) {
+        PreparedStatement ps = conn.prepareStatement(
+            "DELETE FROM users WHERE id=?"
+        );
+        ps.setInt(1, Integer.parseInt(request.getParameter("id")));
+        ps.executeUpdate();
+        ps.close();
+    }
+%>
+
+<html>
+<head>
+    <title>Single JSP CRUD - Oracle 10g</title>
+</head>
+<body>
+
+<h2>User CRUD (Single JSP - Oracle 10g)</h2>
+
+<!-- CREATE FORM -->
+<form method="post">
+    <input type="hidden" name="action" value="insert">
+    Name: <input type="text" name="name" required>
+    Email: <input type="email" name="email" required>
+    <input type="submit" value="Add">
+</form>
+
+<hr>
+
+<!-- READ DATA -->
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+
+<%
+    Statement st = conn.createStatement();
+    ResultSet rs = st.executeQuery("SELECT * FROM users ORDER BY id");
+
+    while (rs.next()) {
+%>
+
+<tr>
+<form method="post">
+    <td><%= rs.getInt("id") %></td>
+
+    <td>
+        <input type="text" name="name"
+               value="<%= rs.getString("name") %>" required>
+    </td>
+
+    <td>
+        <input type="email" name="email"
+               value="<%= rs.getString("email") %>" required>
+    </td>
+
+    <td>
+        <input type="hidden" name="id"
+               value="<%= rs.getInt("id") %>">
+
+        <button type="submit" name="action" value="update">
+            Update
+        </button>
+
+        <button type="submit" name="action" value="delete"
+                onclick="return confirm('Are you sure?')">
+            Delete
+        </button>
+    </td>
+</form>
+</tr>
+
+<%
+    }
+
+    rs.close();
+    st.close();
+    conn.close();
+%>
+
+</table>
+
+</body>
+</html>
