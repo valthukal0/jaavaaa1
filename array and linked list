@@ -1,0 +1,29 @@
+import java.util.ArrayList;
+import java.util.LinkedList;
+
+public class ListDemo {
+    public static void main(String[] args) {
+
+        // ArrayList
+        ArrayList<String> arrayList = new ArrayList<>();
+        arrayList.add("Java");
+        arrayList.add("Python");
+        arrayList.add("C++");
+
+        System.out.println("ArrayList elements:");
+        for(String s : arrayList) {
+            System.out.println(s);
+        }
+
+        // LinkedList
+        LinkedList<String> linkedList = new LinkedList<>();
+        linkedList.add("HTML");
+        linkedList.add("CSS");
+        linkedList.add("JavaScript");
+
+        System.out.println("\nLinkedList elements:");
+        for(String s : linkedList) {
+            System.out.println(s);
+        }
+    }
+}
